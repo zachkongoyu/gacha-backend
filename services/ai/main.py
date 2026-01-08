@@ -1,5 +1,6 @@
 """AI service main application for content generation."""
 from typing import Optional, Dict, Any
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Header
 from pydantic import BaseModel
 import uuid
@@ -10,10 +11,21 @@ from shared.auth import decode_access_token
 from shared.database import create_db_pool, close_db_pool
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Manage application lifespan (startup and shutdown)."""
+    # Startup
+    await create_db_pool()
+    yield
+    # Shutdown
+    await close_db_pool()
+
+
 app = FastAPI(
     title="AI Service",
     description="AI content generation service",
-    version="0.1.0"
+    version="0.1.0",
+    lifespan=lifespan
 )
 
 
@@ -31,18 +43,6 @@ class JobResponse(BaseModel):
     created_at: str
     completed_at: Optional[str] = None
     result: Optional[Dict[str, Any]] = None
-
-
-@app.on_event("startup")
-async def startup_event():
-    """Initialize database pool on startup."""
-    await create_db_pool()
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Close database pool on shutdown."""
-    await close_db_pool()
 
 
 @app.get("/")

@@ -32,7 +32,8 @@ async def close_db_pool() -> None:
         _pool = None
 
 
-async def get_db_connection():
+@asynccontextmanager
+async def get_db_connection() -> AsyncGenerator[asyncpg.Connection, None]:
     """Get a database connection from the pool."""
     pool = await create_db_pool()
     async with pool.acquire() as connection:

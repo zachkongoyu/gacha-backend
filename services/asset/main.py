@@ -1,5 +1,6 @@
 """Asset service main application for CDN and asset URLs."""
 from typing import List, Optional
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel
 
@@ -7,10 +8,21 @@ from shared.settings import settings
 from shared.database import create_db_pool, close_db_pool
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Manage application lifespan (startup and shutdown)."""
+    # Startup
+    await create_db_pool()
+    yield
+    # Shutdown
+    await close_db_pool()
+
+
 app = FastAPI(
     title="Asset Service",
     description="Asset and CDN URL management service",
-    version="0.1.0"
+    version="0.1.0",
+    lifespan=lifespan
 )
 
 
@@ -27,18 +39,6 @@ class AssetBatch(BaseModel):
     """Batch asset response."""
     assets: List[AssetResponse]
     total: int
-
-
-@app.on_event("startup")
-async def startup_event():
-    """Initialize database pool on startup."""
-    await create_db_pool()
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Close database pool on shutdown."""
-    await close_db_pool()
 
 
 @app.get("/")
