@@ -1,0 +1,51 @@
+{
+  "version": 2,
+  "name": "gacha-backend",
+  "builds": [
+    {
+      "src": "api/auth.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/gacha.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/inventory.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/ai.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/asset.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/auth/(.*)",
+      "dest": "/api/auth.py"
+    },
+    {
+      "src": "/gacha/(.*)",
+      "dest": "/api/gacha.py"
+    },
+    {
+      "src": "/inventory/(.*)",
+      "dest": "/api/inventory.py"
+    },
+    {
+      "src": "/ai/(.*)",
+      "dest": "/api/ai.py"
+    },
+    {
+      "src": "/asset/(.*)",
+      "dest": "/api/asset.py"
+    }
+  ],
+  "env": {
+    "ENVIRONMENT": "production"
+  }
+}
