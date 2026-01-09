@@ -1,4 +1,5 @@
 """Database utilities for async PostgreSQL connections."""
+
 from typing import AsyncGenerator
 from contextlib import asynccontextmanager
 import asyncpg
